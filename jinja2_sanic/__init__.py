@@ -1,5 +1,6 @@
 from sanic import Sanic
 from sanic.exceptions import ServerError
+from sanic.response import HTTPResponse
 from collections import Mapping
 import asyncio
 import functools
@@ -86,8 +87,18 @@ def render_string(template_name, request, context, *, app_key=APP_KEY):
 
 
 def render_template(template_name, request, context, *,
-                    app_key=APP_KEY, encoding='utf-8', status=200):
-    pass
+                    app_key=APP_KEY, encoding='utf-8',
+                    headers=None, status=200):
+    if context is None:
+        context = {}
+
+    text = render_string(template_name, request, context, app_key=app_key)
+    content_type = "text/html; charset={encoding}".format(encoding=encoding)
+
+    return HTTPResponse(
+        text, status=status, headers=headers,
+        content_type=content_type
+    )
 
 
 def template(template_name, *, app_key=APP_KEY, encoding='utf-8', status=200):
