@@ -58,7 +58,31 @@ def get_env(app, *, app_key=APP_KEY):
 
 
 def render_string(template_name, request, context, *, app_key=APP_KEY):
-    env = request.app.get()
+    """
+    Render a string by filling context with Template template_name.
+    """
+    env = getattr(request.app, app_key)
+    if not env:
+        raise ServerError(
+            "Template engine has not been initialized yet.",
+            status_code=500,
+        )
+    try:
+        template = env.get_template(template_name)
+    except jinja2.TemplateNotFound as e:
+        raise ServerError(
+            "Template '{}' not found".format(template_name),
+            status_code=500,
+        )
+    if not isinstance(context, Mapping):
+        raise ServerError(
+            "context should be mapping, not {}".format(type(context)),
+            status_code=500,
+        )
+    if request.get(REQUEST_CONTEXT_KEY):
+        context = dict(request[REQUEST_CONTEXT_KEY], **context)
+    text = template.render(context)
+    return text
 
 
 def render_template(template_name, request, context, *,
