@@ -16,7 +16,7 @@ def test(build):
     build.packages.install("radon")
     build.executables.run([
         "pytest", "./tests",
-        "--cov", "sanic_jinja2",
+        "--cov", "jinja2_sanic",
         "--cov-report", "term-missing",
     ] + build.options.args)
 

@@ -13,13 +13,13 @@ install_requires = [
 
 tests_require = []
 
-setup(name='sanic-jinja2',
+setup(name='jinja2-sanic',
       version='0.1.1',
       description='',
       long_description=open(README_PATH).read(),
       author='Yun Xu',
       author_email='yunxu1992@gmail.com',
-      url='https://github.com/yunstanford/sanic-jinja2',
+      url='https://github.com/yunstanford/jinja2-sanic',
       packages=find_packages(),
       install_requires=install_requires,
       classifiers=[
