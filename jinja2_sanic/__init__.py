@@ -52,14 +52,14 @@ def get_env(app, *, app_key=APP_KEY):
     """
     Get Jinja2 env.
     """
-    return getattr(app, app_key)
+    return getattr(app, app_key, None)
 
 
 def render_string(template_name, request, context, *, app_key=APP_KEY):
     """
     Render a string by filling context with Template template_name.
     """
-    env = getattr(request.app, app_key)
+    env = get_env(request.app, app_key=app_key)
     if not env:
         raise ServerError(
             "Template engine has not been initialized yet.",
