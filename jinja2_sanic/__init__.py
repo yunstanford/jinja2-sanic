@@ -1,6 +1,7 @@
 from sanic import Sanic
 from sanic.exceptions import ServerError
 from sanic.response import HTTPResponse
+from sanic.views import HTTPMethodView
 from collections import Mapping
 import asyncio
 import functools
@@ -101,8 +102,30 @@ def render_template(template_name, request, context, *,
     )
 
 
-def template(template_name, *, app_key=APP_KEY, encoding='utf-8', status=200):
-    pass
+def template(template_name, *, app_key=APP_KEY, encoding='utf-8',
+             headers=None, status=200):
+
+    def wrapper(func):
+        @functools.wraps(func)
+        async def wrapped(*args, **kwargs):
+            if asyncio.iscoroutinefunction(func):
+                coro = func
+            else:
+                coro = asyncio.coroutine(func)
+            context = await coro(*args, **kwargs)
+
+            if isinstance(context, HTTPResponse):
+                return context
+
+            if isinstance(args[0], HTTPMethodView):
+                request = args[1]
+            else:
+                request = args[0]
+
+            return render_template(template_name, request, context,
+                                   app_key=app_key, encoding=encoding)
+
+    return wrapper
 
 
 async def context_processors_middleware(app, handler):
