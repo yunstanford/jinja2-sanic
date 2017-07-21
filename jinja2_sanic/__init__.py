@@ -41,7 +41,7 @@ def setup(app, *args, app_key=APP_KEY, context_processors=(),
         if not hasattr(app, APP_CONTEXT_PROCESSORS_KEY):
             setattr(app, APP_CONTEXT_PROCESSORS_KEY, context_processors)
 
-        app.register_middleware(context_processors_middleware, attach_to='request')
+        app.request_middleware.append(context_processors_middleware)
 
     def url(__sanic_jinja2_route_name, **kwargs):
         return app.url_for(__sanic_jinja2_route_name, **kwargs)
@@ -131,16 +131,13 @@ def template(template_name, *, app_key=APP_KEY, encoding='utf-8',
     return wrapper
 
 
-async def context_processors_middleware(app, handler):
-
-    async def middleware(request):
-        request[REQUEST_CONTEXT_KEY] = {}
-        for processor in getattr(app, APP_CONTEXT_PROCESSORS_KEY):
-            request[REQUEST_CONTEXT_KEY].update(
-                await processor(request)
-            )
-        return await handler(request)
-    return middleware
+async def context_processors_middleware(request):
+    request[REQUEST_CONTEXT_KEY] = {}
+    for processor in getattr(request.app, APP_CONTEXT_PROCESSORS_KEY):
+        request[REQUEST_CONTEXT_KEY].update(
+            await processor(request)
+        )
+    return None
 
 
 async def request_processor(request):
