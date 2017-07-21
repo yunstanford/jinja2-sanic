@@ -43,10 +43,6 @@ def setup(app, *args, app_key=APP_KEY, context_processors=(),
 
         app.request_middleware.append(context_processors_middleware)
 
-    def url(__sanic_jinja2_route_name, **kwargs):
-        return app.url_for(__sanic_jinja2_route_name, **kwargs)
-
-    env.globals['url'] = url
     env.globals['app'] = app
 
     return env
