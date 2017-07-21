@@ -108,10 +108,12 @@ def template(template_name, *, app_key=APP_KEY, encoding='utf-8',
     def wrapper(func):
         @functools.wraps(func)
         async def wrapped(*args, **kwargs):
+
             if asyncio.iscoroutinefunction(func):
                 coro = func
             else:
                 coro = asyncio.coroutine(func)
+
             context = await coro(*args, **kwargs)
 
             if isinstance(context, HTTPResponse):
@@ -124,6 +126,7 @@ def template(template_name, *, app_key=APP_KEY, encoding='utf-8',
 
             return render_template(template_name, request, context,
                                    app_key=app_key, encoding=encoding)
+        return wrapped
 
     return wrapper
 
