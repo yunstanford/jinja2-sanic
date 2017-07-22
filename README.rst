@@ -43,7 +43,7 @@ Quick Start
 
     app = Sanic("sanic_jinja2_render")
 
-    # setup jinja2 environment
+    # Setup jinja2 environment
     template = "<html><body><h1>{{Player}}</h1>{{Category}}</body></html>"
     jinja2_sanic.setup(
         app,
@@ -64,6 +64,21 @@ Quick Start
         }
 
     # Usage in class-based views
+    class SimpleView(HTTPMethodView):
+
+        @jinja2_sanic.template("templates.jinja2")
+        async def get(self, request):
+            return {
+                "Player": "CR7",
+                "Category": "Soccer",
+            }
+
+    # register routes
+    app.add_route(SimpleView.as_view(), "/")
+
+    # Start Server
+    if __name__ == "__main__":
+        app.run(host="0.0.0.0", port=8000)
 
 
 -----------
