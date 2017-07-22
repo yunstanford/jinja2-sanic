@@ -73,7 +73,7 @@ Quick Start
                 "Category": "Soccer",
             }
 
-    # register routes
+    # register class based view routes
     app.add_route(SimpleView.as_view(), "/")
 
     # Start Server
