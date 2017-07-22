@@ -8,7 +8,7 @@ import functools
 import jinja2
 
 
-__version__ = '0.1.0'
+__version__ = '0.1.2'
 
 
 # Constants
