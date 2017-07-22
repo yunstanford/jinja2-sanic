@@ -24,7 +24,14 @@ class SanicJinjia2Exception(Exception):
 def setup(app, *args, app_key=APP_KEY, context_processors=(),
           filters=None, **kwargs):
     """
-    Setup a Sanic app with Jinja2.
+    Initialize jinja2.Environment object.
+
+    :param app: a Sanic instance
+    :param app_key: an optional key for application instance. If not
+                    provided, default value will be used.
+    :param context_processors: context processors that will be used in
+                               request middlewares.
+    :param args and kwargs: will be passed to environment constructor.
     """
     env = jinja2.Environment(*args, **kwargs)
 
@@ -50,14 +57,25 @@ def setup(app, *args, app_key=APP_KEY, context_processors=(),
 
 def get_env(app, *, app_key=APP_KEY):
     """
-    Get Jinja2 env.
+    Get Jinja2 env by `app_key`.
+
+    :param app: a Sanic instance
+    :param app_key: a optional key for application instance. If not provided,
+                    default value will be used.
     """
     return getattr(app, app_key, None)
 
 
 def render_string(template_name, request, context, *, app_key=APP_KEY):
     """
-    Render a string by filling context with Template template_name.
+    Render a string by filling Template template_name with context.
+    Returns a string.
+
+    :param template_name: template name.
+    :param request: a parameter from web-handler, sanic.request.Request instance.
+    :param context: context for rendering.
+    :param app_key: a optional key for application instance. If not provided,
+                    default value will be used.
     """
     env = get_env(request.app, app_key=app_key)
     if not env:
@@ -86,6 +104,18 @@ def render_string(template_name, request, context, *, app_key=APP_KEY):
 def render_template(template_name, request, context, *,
                     app_key=APP_KEY, encoding='utf-8',
                     headers=None, status=200):
+    """
+    Return sanic.response.Response which contains template template_name filled with context.
+    Returned response has Content-Type header set to 'text/html'.
+
+    :param template_name: template name.
+    :param request: a parameter from web-handler, sanic.request.Request instance.
+    :param context: context for rendering.
+    :param encoding: response encoding, 'utf-8' by default.
+    :param status: HTTP status code for returned response, 200 (OK) by default.
+    :param app_key: a optional key for application instance. If not provided,
+                    default value will be used.
+    """
     if context is None:
         context = {}
 
@@ -100,7 +130,18 @@ def render_template(template_name, request, context, *,
 
 def template(template_name, *, app_key=APP_KEY, encoding='utf-8',
              headers=None, status=200):
+    """
+    Decorate web-handler to convert returned dict context into sanic.response.Response
+    filled with template_name template.
 
+    :param template_name: template name.
+    :param request: a parameter from web-handler, sanic.request.Request instance.
+    :param context: context for rendering.
+    :param encoding: response encoding, 'utf-8' by default.
+    :param status: HTTP status code for returned response, 200 (OK) by default.
+    :param app_key: a optional key for application instance. If not provided,
+                    default value will be used.
+    """
     def wrapper(func):
         @functools.wraps(func)
         async def wrapped(*args, **kwargs):
