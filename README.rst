@@ -22,6 +22,9 @@ You can find out more here:
 http://jinja2-sanic.readthedocs.io/en/latest/
 
 
+This lib has been strongly influenced by `aiohttp-jinja2 <https://github.com/aio-libs/aiohttp-jinja2>`_.
+
+
 -------
 Install
 -------
